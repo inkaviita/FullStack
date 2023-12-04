@@ -1,0 +1,17 @@
+# FullStack
+
+0.6
+
+sequenceDiagram
+    participant browser
+    participant server
+    participant database
+
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
+    activate server
+    server->>database: Save new note in the database
+    activate database
+    database-->>server: Note saved
+    deactivate database
+    server-->>browser: Note saved successfully
+    deactivate server
