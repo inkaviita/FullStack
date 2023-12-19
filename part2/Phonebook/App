@@ -1,5 +1,7 @@
 import { useState } from 'react'
-
+import Button from './components/Button'
+import Filter from "./components/Filter"
+import Form from './components/Form'
 
 const App = () => {
 
@@ -26,34 +28,7 @@ const App = () => {
     
   }
 
-  const Button = (props) => {
-    return(
-      <button onClick = {props.onClick}>
-        {props.text}
-      </button>
-    )
-  }
-
-  const Filter = () => {
-
-    if (search === "") {
-        return <div>{values.map((person, index) => <ul key = {index}> {person.name} {person.number}</ul>)}</div>
-    }
-    else if (values.length > 0){
-      const searchInLower = search.toLowerCase()
-      const filtered = values.filter((x)=> x.name.toLowerCase().includes(searchInLower))
-      return(
-      <div>
-        {filtered.map((person, index) => (
-        <ul key={index}>
-          {person.name} {person.number}
-        </ul>))}
-      </div>)
-      
-    }
-  }
-
-
+  
   return (
     <div>
       <h2>Phonebook</h2>
@@ -62,18 +37,14 @@ const App = () => {
           <input value = {search} onChange = {e => setSearch(e.target.value)}></input>
         </div>
       </form>
-      <form onSubmit = {Click}>
-        <h1>add a new</h1>
-        <div>
-          name: <input value = {newName} onChange = {e => setNewName(e.target.value)}/>
-        </div>
-        <div>
-          number: <input value = {newNumber} onChange = {e => setNewNumber(e.target.value)}/>
-        </div>
-        <Button type="submit" text="add"/>
-      </form>
+      <Form 
+        newName={newName}
+        newNumber={newNumber}
+        setNewName={setNewName}
+        setNewNumber={setNewNumber}
+        Click={Click}/>
       <h2>Numbers</h2>
-      <Filter/>
+      <Filter list = {values} search = {search}/>
     </div>
   )
 }
