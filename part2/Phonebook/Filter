@@ -1,0 +1,20 @@
+const Filter = ({list, search}) => {
+
+    if (search === "") {
+        return <div>{list.map((person, index) => <ul key = {index}> {person.name} {person.number}</ul>)}</div>
+    }
+    else if (list.length > 0){
+      const searchInLower = search.toLowerCase()
+      const filtered = list.filter((x)=> x.name.toLowerCase().includes(searchInLower))
+      return(
+      <div>
+        {filtered.map((person, index) => (
+        <ul key={index}>
+          {person.name} {person.number}
+        </ul>))}
+      </div>)
+      
+    }
+  }
+
+export default Filter
