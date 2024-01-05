@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Button from './components/Button'
 import Filter from "./components/Filter"
 import Form from './components/Form'
@@ -6,12 +7,22 @@ import Form from './components/Form'
 const App = () => {
 
   const [newName, setNewName] = useState('')
-  const [values, setValues] = useState([
-   {name: 'Arto Hellas', number: "040-1234567"}
-  ])
+  const [values, setValues] = useState([])
   const [newNumber, setNewNumber] = useState("")
-
   const [search, setSearch] = useState("")
+
+  const hook = () => {
+    console.log('effect')
+    axios
+      .get('http://localhost:3002/persons')
+      .then(response => {
+        console.log('promise fulfilled')
+        setValues(response.data)
+      })
+  }
+  
+  useEffect(hook, [])
+  console.log('render', values.length, 'persons')
 
   const Click = (event) => {
     event.preventDefault()
