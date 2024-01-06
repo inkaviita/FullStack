@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from "./components/Filter"
 import Form from './components/Form'
 import dataService from "./services/data"
+import Notification from './components/Notification'
 
 const App = () => {
 
@@ -9,6 +10,7 @@ const App = () => {
   const [values, setValues] = useState([])
   const [newNumber, setNewNumber] = useState("")
   const [search, setSearch] = useState("")
+  const [errorMessage, setErrorMessage] = useState(null)
 
   /*const hook = () => {
     console.log('effect')
@@ -61,6 +63,8 @@ const App = () => {
           setNewName("")
           setNewNumber("")
         })
+        setErrorMessage("Changed the number of " + newName)
+
       }
 
     } else {
@@ -73,6 +77,8 @@ const App = () => {
         setNewName("")
         setNewNumber("")
       })
+      setErrorMessage("Added " + newName)
+      
 
      /* axios.post("http://localhost:3002/persons", newVal)
     .then(response => {
@@ -84,12 +90,16 @@ const App = () => {
 
       
     }
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
   }
 
   
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage}/>
       <form>
         <div>
           <input value = {search} onChange = {e => setSearch(e.target.value)}></input>
