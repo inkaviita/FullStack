@@ -5,8 +5,8 @@ const mongoose = require('mongoose')
 
 
 if (process.argv.length<3) {
-  console.log('give password as argument')
-  process.exit(1)
+    console.log('give password as argument')
+    process.exit(1)
 }
 
 const password = process.argv[2]
@@ -21,8 +21,8 @@ mongoose.connect(url)
 const valueSchema = new mongoose.Schema({
     name: String,
     number: String,
-  })
-  
+})
+
 const Value = mongoose.model('Value', valueSchema)
 
 const value = new Value({
@@ -31,19 +31,18 @@ const value = new Value({
 })
 
 if (process.argv.length > 3) {
-value.save().then(result => {
-    console.log("Added "+ value.name + " number "+ value.number + " to phonebook" );
-    mongoose.connection.close()
-})
-}
-
-if (process.argv.length == 3) {
-Value.find({}).then(result => {
-    result.forEach(note => {
-      console.log(note)
+    value.save().then(() => {
+        console.log('Added '+ value.name + ' number '+ value.number + ' to phonebook' )
+        mongoose.connection.close()
     })
-    mongoose.connection.close()
-  })
 }
 
-  
+if (process.argv.length === 3) {
+    Value.find({}).then(result => {
+        result.forEach(note => {
+            console.log(note)
+        })
+        mongoose.connection.close()
+    })
+}
+
