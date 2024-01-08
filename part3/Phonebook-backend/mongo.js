@@ -30,16 +30,20 @@ const value = new Value({
     number: process.argv[4],
 })
 
+if (process.argv.length > 3) {
 value.save().then(result => {
-    console.log("Value saved!");
+    console.log("Added "+ value.name + " number "+ value.number + " to phonebook" );
     mongoose.connection.close()
 })
+}
 
+if (process.argv.length == 3) {
 Value.find({}).then(result => {
     result.forEach(note => {
       console.log(note)
     })
     mongoose.connection.close()
   })
+}
 
   
