@@ -3,6 +3,7 @@ import Blog from './components/Blog.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
+import NewBlogForm from './components/NewBlogForm.jsx'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -13,6 +14,7 @@ const App = () => {
   const [newTitle, setNewTitle] = useState("")
   const [newAuthor, setNewAuthor] = useState("")
   const [newUrl, setNewUrl] = useState("")
+  const [newVisible, setNewVisible] = useState(false)
 
 
   useEffect(() => {
@@ -29,6 +31,17 @@ const App = () => {
       
     }
   }, [])
+
+  const handleTitleChange = (event) => (
+    setNewTitle(event.target.value)
+  )
+
+  const handleAuthorChange = (event) => (
+    setNewAuthor(event.target.value)
+  )
+  const handleUrlChange = (event) => (
+    setNewUrl(event.target.value)
+  )
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -88,36 +101,9 @@ const App = () => {
     
       }
 
-  const handleTitleChange = (event) => (
-    setNewTitle(event.target.value)
-  
-  )
 
-  const handleAuthorChange = (event) => (
-    setNewAuthor(event.target.value)
-  )
-  const handleUrlChange = (event) => (
-    setNewUrl(event.target.value)
-  )
 
-  const newBlogForm = () => (
-    <form onSubmit={handleNewPost}>
-      <div>title: <input
-        value={newTitle}
-        onChange={handleTitleChange}
-        /></div>
-      <div>author: <input
-        value={newAuthor}
-        onChange={handleAuthorChange}
-        /></div>
-      <div>url: <input
-        value={newUrl}
-        onChange={handleUrlChange}
-        /></div>
-      
-        <button type='submit'>save</button>
-    </form>
-  )
+
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -148,6 +134,30 @@ const App = () => {
     setUser(null)
   }
 
+  const newForm = () => {
+    const hideWhenVisible = { display: newVisible ? 'none' : ''}
+    const showWhenVisible = { display: newVisible ? '' : 'none'}
+
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setNewVisible(true)}>add new</button>
+        </div>
+        <div style = {showWhenVisible}>
+          <NewBlogForm 
+            handleNewPost = {handleNewPost}
+            handleAuthorChange={handleAuthorChange}
+            handleUrlChange={handleUrlChange}
+            handleTitleChange={handleTitleChange}
+            newTitle={newTitle}
+            newAuthor={newAuthor}
+            newUrl={newUrl} />
+          <button onClick={() => setNewVisible(false)}>close</button>
+        </div>
+      </div>
+    )
+  }
+
 
   if (user === null) {
     return (
@@ -168,7 +178,7 @@ const App = () => {
       <p></p>
       <Notification message={errorMessage} />
       <h2>Create a new blog</h2>
-      {newBlogForm()}
+      {newForm()}
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
