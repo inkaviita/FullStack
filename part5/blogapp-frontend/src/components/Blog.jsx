@@ -3,7 +3,6 @@ import React from "react";
 const Blog = ({ blog, expanded, toggleExpand, like, deleteBlog, loggedUser }) => (
   <li className="blog">
     {blog.title} {blog.author}
-    <p>{blog.user.username}  ---  {loggedUser.username}</p> 
     {expanded && (
       <><div id="moreInfo">
         <p>URL: {blog.url}</p>
