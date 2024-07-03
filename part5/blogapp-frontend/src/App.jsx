@@ -3,7 +3,7 @@ import Blog from './components/Blog.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
-import NewBlogForm from './components/NewBlogForm.jsx'
+import NewBlogForm from './components/fullNewBlogForm.jsx'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,16 +11,16 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [newTitle, setNewTitle] = useState("")
-  const [newAuthor, setNewAuthor] = useState("")
-  const [newUrl, setNewUrl] = useState("")
   const [newVisible, setNewVisible] = useState(false)
+  const [expandedBlogIds, setExpandedBlogIds] = useState(new Set());
 
+  const fetchBlogs = async () => {
+    const blogs = await blogService.getAll()
+    setBlogs(blogs.sort((a, b) => b.likes - a.likes))
+  }
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    fetchBlogs()
   }, [])
 
   useEffect(() => {
@@ -32,16 +32,6 @@ const App = () => {
     }
   }, [])
 
-  const handleTitleChange = (event) => (
-    setNewTitle(event.target.value)
-  )
-
-  const handleAuthorChange = (event) => (
-    setNewAuthor(event.target.value)
-  )
-  const handleUrlChange = (event) => (
-    setNewUrl(event.target.value)
-  )
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -70,39 +60,17 @@ const App = () => {
     }
   }
 
-  const handleNewPost = async (event) => {
-    event.preventDefault()
-
-    const newBlog = {
-      user: user,
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
-
-    const auth = user.token
-    const saveTitle = newBlog.title
-    const saveAuthor = newBlog.author
-
-    blogService
-      .create(newBlog)
-        .then(blog => {
-          setBlogs(blogs.concat(blog))
-          setNewAuthor("")
-          setNewTitle("")
-          setNewUrl("")
-          setErrorMessage(
-            `a new blog ${saveTitle} by ${saveAuthor} added`
-          )
-          setTimeout(() => {
-            setErrorMessage(null)
-          }, 5000)
-        })
-    
+  const toggleExpand = (id) => {
+    setExpandedBlogIds(prevState => {
+      const newSet = new Set(prevState);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
       }
-
-
-
+      return newSet;
+    });
+  };
 
 
   const loginForm = () => (
@@ -110,6 +78,7 @@ const App = () => {
       <div>
         username
           <input
+          id='username'
           type="text"
           value={username}
           name="Username"
@@ -119,13 +88,14 @@ const App = () => {
       <div>
         password
           <input
+          id='password'
           type="password"
           value={password}
           name="Password"
           onChange={({ target }) => setPassword(target.value)}
         />
       </div>
-      <button type="submit">login</button>
+      <button id='login-button' type="submit">login</button>
     </form>      
   )
 
@@ -145,18 +115,48 @@ const App = () => {
         </div>
         <div style = {showWhenVisible}>
           <NewBlogForm 
-            handleNewPost = {handleNewPost}
-            handleAuthorChange={handleAuthorChange}
-            handleUrlChange={handleUrlChange}
-            handleTitleChange={handleTitleChange}
-            newTitle={newTitle}
-            newAuthor={newAuthor}
-            newUrl={newUrl} />
+            user = {user}
+            blogs = {blogs}
+            setBlogs = {setBlogs} 
+            setErrorMessage = {setErrorMessage} 
+            blogService = {blogService} />
           <button onClick={() => setNewVisible(false)}>close</button>
         </div>
       </div>
     )
   }
+
+  const handleDelete = async (id) => {
+    const blog = blogs.find(b => b.id === id)
+    try {
+      if (window.confirm("Do you really want to delete this post?")) {
+        await blogService.deleteBlog(id)
+        setBlogs(blogs.filter(b => b.id !== id))
+      }
+
+    } catch (exception) {
+      setErrorMessage("Error deleting blog")
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  }
+
+  const handleLike = async (id) => {
+    const blog = blogs.find(b => b.id === id);
+    const updatedBlog = { ...blog, likes: blog.likes + 1 };
+
+    try {
+      const returnedBlog = await blogService.like(id, updatedBlog);
+      setBlogs(blogs.map(b => (b.id === id ? returnedBlog : b)));
+    } catch (exception) {
+      setErrorMessage('Error updating likes');
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
 
 
   if (user === null) {
@@ -179,9 +179,16 @@ const App = () => {
       <Notification message={errorMessage} />
       <h2>Create a new blog</h2>
       {newForm()}
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+        {blogs.map(blog => (
+            <Blog
+              blog={blog}
+              expanded={expandedBlogIds.has(blog.id)}
+              toggleExpand={() => toggleExpand(blog.id)}
+              like = {handleLike}
+              deleteBlog={handleDelete}
+              loggedUser = {user}
+            />
+        ))}
       
     </div>
   )
