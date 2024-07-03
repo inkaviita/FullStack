@@ -1,5 +1,5 @@
 import React from "react";
-
+ 
 const Blog = ({ blog, expanded, toggleExpand, like, deleteBlog, loggedUser }) => (
   <li className="blog">
     {blog.title} {blog.author}
